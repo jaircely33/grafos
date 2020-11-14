@@ -1,5 +1,22 @@
+.fondo {
+    background: #323743 !important;
+}
+
 .bg-primary {
-    background-color: #4e73df!important;
+    background-color: #707cd2 !important;
+}
+
+.btn-success {
+    background-color: #707cd2 !important;
+    border: none;
+}
+
+table th {
+    min-width: 120px;
+}
+
+.matriz {
+    max-height: 500px;
 }
 
 footer {
