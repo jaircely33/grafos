@@ -19,6 +19,23 @@ table th {
     max-height: 500px;
 }
 
+select {
+    text-align-last: center;
+    width: 50px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 0;
+    color: #f3f3f3;
+    background: #555;
+    background-size: 29px;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
 footer {
     /*position: fixed;*/
     height: 100px;

@@ -2,7 +2,7 @@
 var informacion = {}; //Objecto donde se almacena toda la informacion del formulario
 
 //Se declaran las constantes
-var VALORES = [0, 1], //Posibles valores para llenar la matriz
+var POSIBLES_VALORES = [0, 1], //Posibles valores para llenar la matriz
     IDTABLE = 'table', //Id de la tabla Html
     DEFAULT = 3; //Numero de filas por defecto
 
@@ -38,7 +38,7 @@ function replaceAll(valor, buscar, reemplazar) {
  *                   y el valor es por lo que se va a reemplazar
  */
 function replaceKey(cadena, objClaves) {
-    if (typeof cadena === "object") {
+    if (typeof objClaves === "object") {
         for (var key in objClaves) {
             cadena = replaceAll(cadena, key, objClaves[key]);
         }
@@ -66,13 +66,28 @@ function crearTabla(id, numero) {
                 let nodo = (i == 0) ? j : i;
                 fila += '<th class="text-center"><input type="text" class="form-control text-center negrita title" onkeyup="actulizarNombre(this)" name="titulo[' + i + '][' + j + ']" id="titulo' + i + j + '" value="Nodo' + nodo + '" data-inverso="' + j + i + '"></th>';
             } else {
-                fila += '<td><input type="text" class="form-control text-center" name="valor[' + (i - 1) + '][' + (j - 1) + ']" id="valor[' + (i - 1) + '][' + (j - 1) + ']" value="0"></td>';
+                fila += '<td><select class="form-control text-center" name="valor[' + (i - 1) + '][' + (j - 1) + ']" id="valor[' + (i - 1) + '][' + (j - 1) + ']" >{{option}}</select></td>';
             }
         }
         celdas += '<tr>' + fila + '</tr>';
     }
+
+    celdas = replaceKey(celdas, {
+        "{{option}}": generarOpciones()
+    });
+
     $('#' + id).append(celdas);
     return celdas;
+}
+
+function generarOpciones() {
+    var opcion = "";
+    if (Array.isArray(POSIBLES_VALORES)) {
+        POSIBLES_VALORES.forEach(function(prop) {
+            opcion += '<option>' + prop + '</option>';
+        });
+    }
+    return opcion;
 }
 
 /*
