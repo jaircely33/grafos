@@ -114,3 +114,41 @@ $("#numero").keyup(function() {
     var numero = $(this).val();
     crearTabla(IDTABLE, numero);
 });
+
+
+$("#llenarMatriz").click(function() {
+    var numero = $("#numero").val();
+    llenarTablaDinamica(IDTABLE, numero);
+});
+
+
+function llenarTablaDinamica(id, numero) {
+    $('#' + id).html('');
+    var celdas = "";
+
+    for (let i = 0; i <= numero; i++) {
+        let fila = "";
+        let titulo = (i == 0) ? true : false;
+
+        for (let j = 0; j <= numero; j++) {
+            if (i == 0 && j == 0) {
+                fila += '<th></th>';
+            } else if (j == 0 || titulo == true) {
+                let nodo = (i == 0) ? j : i;
+                fila += '<th class="text-center"><input type="text" class="form-control text-center negrita title" onkeyup="actulizarNombre(this)" name="titulo[' + i + '][' + j + ']" id="titulo' + i + j + '" value="Nodo' + nodo + '" data-inverso="' + j + i + '"></th>';
+            } else {
+                fila += '<td><select class="form-control text-center" name="valor[' + (i - 1) + '][' + (j - 1) + ']" id="valor[' + (i - 1) + '][' + (j - 1) + ']" ><option>' + Math.floor(Math.random() * 2); + '</option></select></td>';
+            }
+        }
+        celdas += '<tr>' + fila + '</tr>';
+    }
+
+    $('#' + id).append(celdas);
+    return celdas;
+}
+
+$("#LimpiarrMatriz").click(function() {
+    var numero = $("#numero").val();
+    crearTabla(IDTABLE, numero);
+});
+
