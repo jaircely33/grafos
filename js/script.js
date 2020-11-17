@@ -1,5 +1,5 @@
 //Se declaran las variables globales
-var informacion = {}; //Objecto donde se almacena toda la informacion del formulario
+var informacion = new Array(2); //Objecto donde se almacena toda la informacion del formulario
 
 //Se declaran las constantes
 var POSIBLES_VALORES = [0, 1], //Posibles valores para llenar la matriz
@@ -84,7 +84,7 @@ function generarOpciones() {
     var opcion = "";
     if (Array.isArray(POSIBLES_VALORES)) {
         POSIBLES_VALORES.forEach(function(prop) {
-            opcion += '<option>' + prop + '</option>';
+            opcion += '<option value='+prop+'>' + prop + '</option>';
         });
     }
     return opcion;
@@ -115,6 +115,36 @@ $("#numero").keyup(function() {
     crearTabla(IDTABLE, numero);
 });
 
+/*
+obtener la informacion de la matriz
+*/
+function obtenerInformacion(){
+    var numero = $("#numero").val();
+    if(validaNumero(numero)){
+        for(let i = 0; i < numero; i++){
+            informacion[i] = new Array(2);
+            for(let j = 0; j < numero; j++){
+                informacion[i][j]=document.getElementById('valor['+i+']['+j+']').value;
+            }
+        }
+    }else{
+        mostrarMensaje('la dimension debe ser mayor a 2');
+    }
+
+}
+/*
+Funcion para validar las dimensiones de la matriz y que sean actas de trabajar
+parametos: numero return boolean
+*/
+function validaNumero(numero){
+    var validar = false;
+    if(numero>1){
+        validar= true;
+    }else{
+        validar = false;
+    }
+    return validar;
+}
 /*
 Funcion para saber si la matriz es reflexiva 
 parametros: matriz  return : boolean
@@ -159,4 +189,12 @@ function isIrreflexiva(_matriz){
 
     }
     return is;
+}
+
+/*
+funtion para mostrar mensaje como alerta
+parametro: mensaje
+*/
+function mostrarMensaje(mensaje){
+alert(mensaje);
 }
