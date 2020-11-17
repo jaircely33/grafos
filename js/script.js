@@ -114,3 +114,49 @@ $("#numero").keyup(function() {
     var numero = $(this).val();
     crearTabla(IDTABLE, numero);
 });
+
+/*
+Funcion para saber si la matriz es reflexiva 
+parametros: matriz  return : boolean
+*/
+function isReflexica(_matriz){
+    var is = true;
+    var nFilas=$('#numero').val();
+    var nColumnas=nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas == columnas && is) {
+                if(_matriz[filas][columnas]==1){
+                    is=true;
+                }else{
+                    is=false;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}/*
+Funcion para saber si la matriz es reflexiva 
+parametros: matriz  return : boolean
+*/
+function isIrreflexiva(_matriz){
+    var is = true;
+    var nFilas=$('#numero').val();
+    var nColumnas=nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas == columnas && is) {
+                if(_matriz[filas][columnas]==0){
+                    is=true;
+                }else{
+                    is=false;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
