@@ -1,10 +1,20 @@
 //Se declaran las variables globales
-var informacion = new Array(2); //Objecto donde se almacena toda la informacion del formulario
+var informacion = {
+    "numero": "",
+    "titulos": [],
+    "matriz": [],
+    "procesado": {}
+}; //Objecto donde se almacena toda la informacion del formulario
 
 //Se declaran las constantes
 var POSIBLES_VALORES = [0, 1], //Posibles valores para llenar la matriz
     IDTABLE = 'table', //Id de la tabla Html
-    DEFAULT = 3; //Numero de filas por defecto
+    DEFAULT = 3, //Numero de filas por defecto
+    MINIMO = 2, //Numero minimo de filas
+    IDPROPIEDADES = 'tableProperty',
+    TARJETAPROPIEDADES = 'tarjetaPropiedades',
+    MENSAJE_CUMPLE = 'Cumple',
+    MENSAJE_NOCUMPLE = 'No cumple';
 
 /*
  * Funcion que imprimer con sangria y espacios en consola.
@@ -44,6 +54,31 @@ function replaceKey(cadena, objClaves) {
         }
     }
     return cadena;
+}
+
+function getProcesado() {
+    return informacion.procesado;
+}
+
+function setProcesado(clave, valor) {
+    if (valor) {
+        valor = MENSAJE_CUMPLE;
+    } else {
+        valor = MENSAJE_NOCUMPLE;
+    }
+    informacion.procesado[clave] = valor;
+}
+
+function getMatriz() {
+    return informacion.matriz;
+}
+
+function getTitulos() {
+    return informacion.titulos;
+}
+
+function getNumero() {
+    return informacion.numero;
 }
 
 /*
@@ -98,7 +133,112 @@ function actulizarNombre(vThis) {
     var inverso = $(vThis).data("inverso"),
         valor = $(vThis).val();
     $('#titulo' + inverso).val(valor);
-};
+}
+
+/*
+obtener la informacion de la matriz
+*/
+function obtenerInformacion() {
+    var numero = $("#numero").val(),
+        datos = [];
+
+    for (let i = 0; i < numero; i++) {
+        datos[i] = [];
+        for (let j = 0; j < numero; j++) {
+            datos[i][j] = document.getElementById('valor' + i + j).value;
+        }
+    }
+
+    informacion.numero = numero;
+    informacion.matriz = datos;
+}
+/*
+Funcion para validar las dimensiones de la matriz que sea numerica y mator al valor MINIMO
+parametos: numero return boolean
+*/
+function validaNumero(numero) {
+    if (numero >= MINIMO && numero.match(/^[0-9.]+$/) !== null) {
+        return true;
+    }
+    return false;
+}
+
+/*
+funtion para mostrar mensaje como alerta
+parametro: mensaje
+*/
+function mostrarMensaje(mensaje) {
+    alert(mensaje);
+}
+
+function llenarTablaDinamica(numero) {
+    for (let i = 0; i <= numero; i++) {
+        for (let j = 0; j <= numero; j++) {
+            $('#valor' + i + j).val(Math.floor(Math.random() * 2));
+        }
+    }
+}
+
+function agregarPropiedad(id) {
+    $('#' + id).html('');
+    var celdas = "",
+        propiedades = getProcesado();
+
+    for (const clave in propiedades) {
+        celdas += '<tr><th scope="row">' + clave + '</th><td>' + propiedades[clave] + '</td></tr>';
+    }
+    $('#' + id).append(celdas);
+}
+
+/*
+Funcion para saber si la matriz es reflexiva 
+parametros: matriz  return : boolean
+*/
+function isReflexica(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas == columnas && is) {
+                if (matriz[filas][columnas] == 1) {
+                    is = true;
+                } else {
+                    is = false;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
+/*
+Funcion para saber si la matriz es reflexiva 
+parametros: matriz  return : boolean
+*/
+function isIrreflexiva(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas == columnas && is) {
+                if (matriz[filas][columnas] == 0) {
+                    is = true;
+                } else {
+                    is = false;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
+
+
+
 
 /*
  * Funciones que se ejecutan al cargar el documento.
@@ -112,109 +252,32 @@ $(document).ready(function() {
  */
 $("#numero").keyup(function() {
     var numero = $(this).val();
-    crearTabla(IDTABLE, numero);
+    if (!validaNumero(numero)) {
+        mostrarMensaje("Valor no valido, debe ser numerico y mayor a 2");
+        $("#procesar").prop('disabled', true);
+    } else {
+        $("#procesar").prop('disabled', false);
+        crearTabla(IDTABLE, numero);
+    }
+    $("#" + TARJETAPROPIEDADES).addClass('d-none');
 });
-
-/*
-obtener la informacion de la matriz
-*/
-function obtenerInformacion() {
-    var numero = $("#numero").val();
-    if (validaNumero(numero)) {
-        for (let i = 0; i < numero; i++) {
-            informacion[i] = new Array(2);
-            for (let j = 0; j < numero; j++) {
-                informacion[i][j] = document.getElementById('valor' + i + j).value;
-            }
-        }
-    } else {
-        mostrarMensaje('la dimension debe ser mayor a 2');
-    }
-    log(informacion);
-}
-/*
-Funcion para validar las dimensiones de la matriz y que sean actas de trabajar
-parametos: numero return boolean
-*/
-function validaNumero(numero) {
-    var validar = false;
-    if (numero > 1) {
-        validar = true;
-    } else {
-        validar = false;
-    }
-    return validar;
-}
-/*
-Funcion para saber si la matriz es reflexiva 
-parametros: matriz  return : boolean
-*/
-function isReflexica(_matriz) {
-    var is = true;
-    var nFilas = $('#numero').val();
-    var nColumnas = nFilas;
-    for (var filas = 0; filas < nFilas; filas++) {
-        for (var columnas = 0; columnas < nColumnas; columnas++) {
-            if (filas == columnas && is) {
-                if (_matriz[filas][columnas] == 1) {
-                    is = true;
-                } else {
-                    is = false;
-                    continue;
-                }
-            }
-        }
-
-    }
-    return is;
-}
-/*
-Funcion para saber si la matriz es reflexiva 
-parametros: matriz  return : boolean
-*/
-function isIrreflexiva(_matriz) {
-    var is = true;
-    var nFilas = $('#numero').val();
-    var nColumnas = nFilas;
-    for (var filas = 0; filas < nFilas; filas++) {
-        for (var columnas = 0; columnas < nColumnas; columnas++) {
-            if (filas == columnas && is) {
-                if (_matriz[filas][columnas] == 0) {
-                    is = true;
-                } else {
-                    is = false;
-                    continue;
-                }
-            }
-        }
-
-    }
-    return is;
-}
-
-/*
-funtion para mostrar mensaje como alerta
-parametro: mensaje
-*/
-function mostrarMensaje(mensaje) {
-    alert(mensaje);
-}
 
 $("#llenarMatriz").click(function() {
     var numero = $("#numero").val();
     llenarTablaDinamica(numero);
 });
 
-
-function llenarTablaDinamica(numero) {
-    for (let i = 0; i <= numero; i++) {
-        for (let j = 0; j <= numero; j++) {
-            $('#valor' + i + j).val(Math.floor(Math.random() * 2));
-        }
-    }
-}
-
 $("#LimpiarrMatriz").click(function() {
     var numero = $("#numero").val();
     crearTabla(IDTABLE, numero);
+});
+
+$("#procesar").click(function() {
+    obtenerInformacion();
+
+    setProcesado('Reflexiva', isReflexica(getMatriz()));
+    setProcesado('Ireflexiva', isIrreflexiva(getMatriz()));
+
+    $("#" + TARJETAPROPIEDADES).removeClass('d-none');
+    agregarPropiedad(IDPROPIEDADES);
 });
