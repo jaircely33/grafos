@@ -16,7 +16,9 @@ var POSIBLES_VALORES = [0, 1], //Posibles valores para llenar la matriz
     IDPROPIEDADES = 'tableProperty',
     TARJETAPROPIEDADES = 'tarjetaPropiedades',
     MENSAJE_CUMPLE = 'Cumple',
-    MENSAJE_NOCUMPLE = 'No cumple';
+    MENSAJE_NOCUMPLE = 'No cumple',
+    IDGRAFO = 'grafos',
+    IDRECORRIDO = 'recorrido';
 
 /*
  * Funcion que imprimer con sangria y espacios en consola.
@@ -417,6 +419,8 @@ $("#numero").keyup(function() {
         crearTabla(IDTABLE, numero);
     }
     $("#" + TARJETAPROPIEDADES).addClass('d-none');
+    $("#" + IDRECORRIDO).addClass('d-none');
+    $("#" + IDGRAFO).addClass('d-none');
 });
 
 $("#llenarMatriz").click(function() {
@@ -433,6 +437,8 @@ $("#procesar").click(function() {
     obtenerInformacion();
     configuracion();
     $("#" + TARJETAPROPIEDADES).removeClass('d-none');
+    $("#" + IDGRAFO).removeClass('d-none');
+    $("#" + IDRECORRIDO).removeClass('d-none');
     agregarPropiedad(IDPROPIEDADES);
     log(informacion);
 });
