@@ -84,7 +84,7 @@ function generarOpciones() {
     var opcion = "";
     if (Array.isArray(POSIBLES_VALORES)) {
         POSIBLES_VALORES.forEach(function(prop) {
-            opcion += '<option value='+prop+'>' + prop + '</option>';
+            opcion += '<option value=' + prop + '>' + prop + '</option>';
         });
     }
     return opcion;
@@ -118,16 +118,16 @@ $("#numero").keyup(function() {
 /*
 obtener la informacion de la matriz
 */
-function obtenerInformacion(){
+function obtenerInformacion() {
     var numero = $("#numero").val();
-    if(validaNumero(numero)){
-        for(let i = 0; i < numero; i++){
+    if (validaNumero(numero)) {
+        for (let i = 0; i < numero; i++) {
             informacion[i] = new Array(2);
-            for(let j = 0; j < numero; j++){
-                informacion[i][j]=document.getElementById('valor['+i+']['+j+']').value;
+            for (let j = 0; j < numero; j++) {
+                informacion[i][j] = document.getElementById('valor[' + i + '][' + j + ']').value;
             }
         }
-    }else{
+    } else {
         mostrarMensaje('la dimension debe ser mayor a 2');
     }
 
@@ -136,11 +136,11 @@ function obtenerInformacion(){
 Funcion para validar las dimensiones de la matriz y que sean actas de trabajar
 parametos: numero return boolean
 */
-function validaNumero(numero){
+function validaNumero(numero) {
     var validar = false;
-    if(numero>1){
-        validar= true;
-    }else{
+    if (numero > 1) {
+        validar = true;
+    } else {
         validar = false;
     }
     return validar;
@@ -149,17 +149,17 @@ function validaNumero(numero){
 Funcion para saber si la matriz es reflexiva 
 parametros: matriz  return : boolean
 */
-function isReflexica(_matriz){
+function isReflexica(_matriz) {
     var is = true;
-    var nFilas=$('#numero').val();
-    var nColumnas=nFilas;
+    var nFilas = $('#numero').val();
+    var nColumnas = nFilas;
     for (var filas = 0; filas < nFilas; filas++) {
         for (var columnas = 0; columnas < nColumnas; columnas++) {
             if (filas == columnas && is) {
-                if(_matriz[filas][columnas]==1){
-                    is=true;
-                }else{
-                    is=false;
+                if (_matriz[filas][columnas] == 1) {
+                    is = true;
+                } else {
+                    is = false;
                     continue;
                 }
             }
@@ -167,21 +167,22 @@ function isReflexica(_matriz){
 
     }
     return is;
-}/*
+}
+/*
 Funcion para saber si la matriz es reflexiva 
 parametros: matriz  return : boolean
 */
-function isIrreflexiva(_matriz){
+function isIrreflexiva(_matriz) {
     var is = true;
-    var nFilas=$('#numero').val();
-    var nColumnas=nFilas;
+    var nFilas = $('#numero').val();
+    var nColumnas = nFilas;
     for (var filas = 0; filas < nFilas; filas++) {
         for (var columnas = 0; columnas < nColumnas; columnas++) {
             if (filas == columnas && is) {
-                if(_matriz[filas][columnas]==0){
-                    is=true;
-                }else{
-                    is=false;
+                if (_matriz[filas][columnas] == 0) {
+                    is = true;
+                } else {
+                    is = false;
                     continue;
                 }
             }
@@ -195,6 +196,42 @@ function isIrreflexiva(_matriz){
 funtion para mostrar mensaje como alerta
 parametro: mensaje
 */
-function mostrarMensaje(mensaje){
-alert(mensaje);
+function mostrarMensaje(mensaje) {
+    alert(mensaje);
 }
+
+$("#llenarMatriz").click(function() {
+    var numero = $("#numero").val();
+    llenarTablaDinamica(IDTABLE, numero);
+});
+
+
+function llenarTablaDinamica(id, numero) {
+    $('#' + id).html('');
+    var celdas = "";
+
+    for (let i = 0; i <= numero; i++) {
+        let fila = "";
+        let titulo = (i == 0) ? true : false;
+
+        for (let j = 0; j <= numero; j++) {
+            if (i == 0 && j == 0) {
+                fila += '<th></th>';
+            } else if (j == 0 || titulo == true) {
+                let nodo = (i == 0) ? j : i;
+                fila += '<th class="text-center"><input type="text" class="form-control text-center negrita title" onkeyup="actulizarNombre(this)" name="titulo[' + i + '][' + j + ']" id="titulo' + i + j + '" value="Nodo' + nodo + '" data-inverso="' + j + i + '"></th>';
+            } else {
+                fila += '<td><select class="form-control text-center" name="valor[' + (i - 1) + '][' + (j - 1) + ']" id="valor[' + (i - 1) + '][' + (j - 1) + ']" ><option>' + Math.floor(Math.random() * 2); + '</option></select></td>';
+            }
+        }
+        celdas += '<tr>' + fila + '</tr>';
+    }
+
+    $('#' + id).append(celdas);
+    return celdas;
+}
+
+$("#LimpiarrMatriz").click(function() {
+    var numero = $("#numero").val();
+    crearTabla(IDTABLE, numero);
+});
