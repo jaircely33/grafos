@@ -318,7 +318,7 @@ function esTransitiva() {
 
 function esEquivalencia() {
     var procesado = getProcesado(),
-        validar = ["Transitiva", "Reflexiva", "Transitiva"],
+        validar = ["Reflexiva", "Simetrica", "Transitiva"],
         equivalencia = true;
 
     if (Array.isArray(validar)) {
@@ -333,7 +333,19 @@ function esEquivalencia() {
 }
 
 function esOrden() {
-    return false;
+    var procesado = getProcesado(),
+        validar = ["Reflexiva", "Antisimetrica", "Transitiva"],
+        parcial = true;
+
+    if (Array.isArray(validar)) {
+        validar.forEach(function(prop) {
+            if (procesado[prop] === false) {
+                parcial = false;
+            }
+        });
+    }
+
+    return parcial;
 }
 
 function configuracion() {
@@ -368,8 +380,8 @@ function configuracion() {
         {
             "nombre": "Orden",
             "funcion": esOrden(),
-            "regla": "Orden Parcial: Si es refletiva, antisimetrica y transitiva.<br>" +
-                "Orden Total: Si es parcial y cada par de elemento es compatibles"
+            "regla": "<i>Orden Parcial:</i> Si es refletiva, antisimetrica y transitiva.<br>" +
+                "<i>Orden Total:</i> Si es parcial y cada par de elemento es compatibles"
         }
     ];
     procesar(finalizar);
