@@ -3,8 +3,10 @@ var informacion = {
     "numero": "",
     "titulos": [],
     "matriz": [],
-    "procesado": {}
+    "procesado": {},
+    "imprimir": []
 }; //Objecto donde se almacena toda la informacion del formulario
+
 
 //Se declaran las constantes
 var POSIBLES_VALORES = [0, 1], //Posibles valores para llenar la matriz
@@ -60,13 +62,30 @@ function getProcesado() {
     return informacion.procesado;
 }
 
+function getImprimir() {
+    return informacion.imprimir;
+}
+
+function getTitulos() {
+    return informacion.titulos;
+}
+
 function setProcesado(clave, valor) {
-    if (valor) {
+    informacion.procesado[clave] = valor;
+}
+
+function setImprimir(clave, valor, texto) {
+    if (valor === true) {
         valor = MENSAJE_CUMPLE;
-    } else {
+    } else if (valor === false) {
         valor = MENSAJE_NOCUMPLE;
     }
-    informacion.procesado[clave] = valor;
+
+    informacion.imprimir.push({
+        "titulo": clave,
+        "valor": valor,
+        "regla": texto
+    });
 }
 
 function getMatriz() {
@@ -140,7 +159,8 @@ obtener la informacion de la matriz
 */
 function obtenerInformacion() {
     var numero = $("#numero").val(),
-        datos = [];
+        datos = [],
+        titulos = [];
 
     for (let i = 0; i < numero; i++) {
         datos[i] = [];
@@ -149,8 +169,15 @@ function obtenerInformacion() {
         }
     }
 
+    for (let i = 1; i <= numero; i++) {
+        titulos[i - 1] = document.getElementById('titulo0' + i).value;
+    }
+
     informacion.numero = numero;
     informacion.matriz = datos;
+    informacion.titulos = titulos;
+    informacion.procesado = {};
+    informacion.imprimir = [];
 }
 /*
 Funcion para validar las dimensiones de la matriz que sea numerica y mator al valor MINIMO
@@ -182,12 +209,34 @@ function llenarTablaDinamica(numero) {
 function agregarPropiedad(id) {
     $('#' + id).html('');
     var celdas = "",
-        propiedades = getProcesado();
+        propiedades = getImprimir();
 
-    for (const clave in propiedades) {
-        celdas += '<tr><th scope="row">' + clave + '</th><td>' + propiedades[clave] + '</td></tr>';
+    if (Array.isArray(propiedades)) {
+        propiedades.forEach(function(prop) {
+            celdas += '<tr><th scope="row">' + prop.titulo + '</th><td>' + prop.regla + '</td><td>' + prop.valor + '</td></tr>';
+        });
     }
+
     $('#' + id).append(celdas);
+}
+
+
+function relaciones(matriz) {
+    var combinaciones = "R = { ",
+        numero = getNumero(),
+        titulos = getTitulos();
+
+    for (var filas = 0; filas < numero; filas++) {
+        for (var columnas = 0; columnas < numero; columnas++) {
+            if (matriz[filas][columnas] == 1) {
+                combinaciones += '(' + titulos[filas] + ', ' + titulos[columnas] + '), ';
+            }
+        }
+    }
+
+    combinaciones += '}';
+
+    return replaceAll(combinaciones, ', }', ' }');;
 }
 
 /*
@@ -237,7 +286,103 @@ function isIrreflexiva(matriz) {
     return is;
 }
 
+function multiplicar(matriz, numero) {
+    var producto = [];
+    for (i = 0; i < numero; i++) {
+        producto[i] = [];
+        for (j = 0; j < numero; j++) {
+            producto[i][j] = matriz[i][j] * matriz[j][i];
+        }
+    }
+    return producto;
+}
 
+
+function esTransitiva() {
+    var matriz = getMatriz(),
+        numero = getNumero(),
+        producto = multiplicar(matriz, numero),
+        transitiva = true;
+
+    for (i = 0; i < numero; i++) {
+        for (j = 0; j < numero; j++) {
+            if (producto[i][j] > matriz[i][j]) {
+                transitiva = false;
+                continue;
+            }
+        }
+    }
+
+    return transitiva;
+}
+
+function esEquivalencia() {
+    var procesado = getProcesado(),
+        validar = ["Transitiva", "Reflexiva", "Transitiva"],
+        equivalencia = true;
+
+    if (Array.isArray(validar)) {
+        validar.forEach(function(prop) {
+            if (procesado[prop] === false) {
+                equivalencia = false;
+            }
+        });
+    }
+
+    return equivalencia;
+}
+
+function esOrden() {
+    return false;
+}
+
+function configuracion() {
+    var proceso = [{
+            "nombre": "Relaciones",
+            "funcion": relaciones(getMatriz()),
+            "regla": "Relacion de los nodos"
+        },
+        {
+            "nombre": "Reflexiva",
+            "funcion": isReflexica(getMatriz()),
+            "regla": "Su diagonal principal contiene todos en 1"
+        },
+        {
+            "nombre": "Ireflexiva",
+            "funcion": isIrreflexiva(getMatriz()),
+            "regla": "Su diagonal principal contiene todos en 0"
+        },
+        {
+            "nombre": "Transitiva",
+            "funcion": esTransitiva(),
+            "regla": "Si el producto matricial es menor o igual a la matriz"
+        }
+    ];
+    procesar(proceso);
+
+    var finalizar = [{
+            "nombre": "Equivalencia",
+            "funcion": esEquivalencia(),
+            "regla": "Si es refletiva, simétrica y transitiva"
+        },
+        {
+            "nombre": "Orden",
+            "funcion": esOrden(),
+            "regla": "Orden Parcial: Si es refletiva, antisimetrica y transitiva.<br>" +
+                "Orden Total: Si es parcial y cada par de elemento es compatibles"
+        }
+    ];
+    procesar(finalizar);
+}
+
+function procesar(proceso) {
+    if (Array.isArray(proceso)) {
+        proceso.forEach(function(prop) {
+            setProcesado(prop.nombre, prop.funcion);
+            setImprimir(prop.nombre, prop.funcion, prop.regla);
+        });
+    }
+}
 
 
 /*
@@ -274,10 +419,8 @@ $("#LimpiarrMatriz").click(function() {
 
 $("#procesar").click(function() {
     obtenerInformacion();
-
-    setProcesado('Reflexiva', isReflexica(getMatriz()));
-    setProcesado('Ireflexiva', isIrreflexiva(getMatriz()));
-
+    configuracion();
     $("#" + TARJETAPROPIEDADES).removeClass('d-none');
     agregarPropiedad(IDPROPIEDADES);
+    log(informacion);
 });
