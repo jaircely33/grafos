@@ -1,10 +1,22 @@
 //Se declaran las variables globales
-var informacion = {}; //Objecto donde se almacena toda la informacion del formulario
+var informacion = {
+    "numero": "",
+    "titulos": [],
+    "matriz": [],
+    "procesado": {},
+    "imprimir": []
+}; //Objecto donde se almacena toda la informacion del formulario
+
 
 //Se declaran las constantes
 var POSIBLES_VALORES = [0, 1], //Posibles valores para llenar la matriz
     IDTABLE = 'table', //Id de la tabla Html
-    DEFAULT = 3; //Numero de filas por defecto
+    DEFAULT = 3, //Numero de filas por defecto
+    MINIMO = 2, //Numero minimo de filas
+    IDPROPIEDADES = 'tableProperty',
+    TARJETAPROPIEDADES = 'tarjetaPropiedades',
+    MENSAJE_CUMPLE = 'Cumple',
+    MENSAJE_NOCUMPLE = 'No cumple';
 
 /*
  * Funcion que imprimer con sangria y espacios en consola.
@@ -46,6 +58,48 @@ function replaceKey(cadena, objClaves) {
     return cadena;
 }
 
+function getProcesado() {
+    return informacion.procesado;
+}
+
+function getImprimir() {
+    return informacion.imprimir;
+}
+
+function getTitulos() {
+    return informacion.titulos;
+}
+
+function setProcesado(clave, valor) {
+    informacion.procesado[clave] = valor;
+}
+
+function setImprimir(clave, valor, texto) {
+    if (valor === true) {
+        valor = MENSAJE_CUMPLE;
+    } else if (valor === false) {
+        valor = MENSAJE_NOCUMPLE;
+    }
+
+    informacion.imprimir.push({
+        "titulo": clave,
+        "valor": valor,
+        "regla": texto
+    });
+}
+
+function getMatriz() {
+    return informacion.matriz;
+}
+
+function getTitulos() {
+    return informacion.titulos;
+}
+
+function getNumero() {
+    return informacion.numero;
+}
+
 /*
  * Funcion que genera la tabla dinamicamente.
  * @param id: Id html de la tabla donde se va a pintar
@@ -66,7 +120,7 @@ function crearTabla(id, numero) {
                 let nodo = (i == 0) ? j : i;
                 fila += '<th class="text-center"><input type="text" class="form-control text-center negrita title" onkeyup="actulizarNombre(this)" name="titulo[' + i + '][' + j + ']" id="titulo' + i + j + '" value="Nodo' + nodo + '" data-inverso="' + j + i + '"></th>';
             } else {
-                fila += '<td><select class="form-control text-center" name="valor[' + (i - 1) + '][' + (j - 1) + ']" id="valor[' + (i - 1) + '][' + (j - 1) + ']" >{{option}}</select></td>';
+                fila += '<td><select class="form-control text-center" name="valor[' + (i - 1) + '][' + (j - 1) + ']" id="valor' + (i - 1) + (j - 1) + '" >{{option}}</select></td>';
             }
         }
         celdas += '<tr>' + fila + '</tr>';
@@ -84,7 +138,7 @@ function generarOpciones() {
     var opcion = "";
     if (Array.isArray(POSIBLES_VALORES)) {
         POSIBLES_VALORES.forEach(function(prop) {
-            opcion += '<option>' + prop + '</option>';
+            opcion += '<option value=' + prop + '>' + prop + '</option>';
         });
     }
     return opcion;
@@ -98,7 +152,238 @@ function actulizarNombre(vThis) {
     var inverso = $(vThis).data("inverso"),
         valor = $(vThis).val();
     $('#titulo' + inverso).val(valor);
-};
+}
+
+/*
+obtener la informacion de la matriz
+*/
+function obtenerInformacion() {
+    var numero = $("#numero").val(),
+        datos = [],
+        titulos = [];
+
+    for (let i = 0; i < numero; i++) {
+        datos[i] = [];
+        for (let j = 0; j < numero; j++) {
+            datos[i][j] = document.getElementById('valor' + i + j).value;
+        }
+    }
+
+    for (let i = 1; i <= numero; i++) {
+        titulos[i - 1] = document.getElementById('titulo0' + i).value;
+    }
+
+    informacion.numero = numero;
+    informacion.matriz = datos;
+    informacion.titulos = titulos;
+    informacion.procesado = {};
+    informacion.imprimir = [];
+}
+/*
+Funcion para validar las dimensiones de la matriz que sea numerica y mator al valor MINIMO
+parametos: numero return boolean
+*/
+function validaNumero(numero) {
+    if (numero >= MINIMO && numero.match(/^[0-9.]+$/) !== null) {
+        return true;
+    }
+    return false;
+}
+
+/*
+funtion para mostrar mensaje como alerta
+parametro: mensaje
+*/
+function mostrarMensaje(mensaje) {
+    alert(mensaje);
+}
+
+function llenarTablaDinamica(numero) {
+    for (let i = 0; i <= numero; i++) {
+        for (let j = 0; j <= numero; j++) {
+            $('#valor' + i + j).val(Math.floor(Math.random() * 2));
+        }
+    }
+}
+
+function agregarPropiedad(id) {
+    $('#' + id).html('');
+    var celdas = "",
+        propiedades = getImprimir();
+
+    if (Array.isArray(propiedades)) {
+        propiedades.forEach(function(prop) {
+            celdas += '<tr><th scope="row">' + prop.titulo + '</th><td>' + prop.regla + '</td><td>' + prop.valor + '</td></tr>';
+        });
+    }
+
+    $('#' + id).append(celdas);
+}
+
+
+function relaciones(matriz) {
+    var combinaciones = "R = { ",
+        numero = getNumero(),
+        titulos = getTitulos();
+
+    for (var filas = 0; filas < numero; filas++) {
+        for (var columnas = 0; columnas < numero; columnas++) {
+            if (matriz[filas][columnas] == 1) {
+                combinaciones += '(' + titulos[filas] + ', ' + titulos[columnas] + '), ';
+            }
+        }
+    }
+
+    combinaciones += '}';
+
+    return replaceAll(combinaciones, ', }', ' }');;
+}
+
+/*
+Funcion para saber si la matriz es reflexiva 
+parametros: matriz  return : boolean
+*/
+function isReflexica(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas == columnas && is) {
+                if (matriz[filas][columnas] == 1) {
+                    is = true;
+                } else {
+                    is = false;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
+/*
+Funcion para saber si la matriz es reflexiva 
+parametros: matriz  return : boolean
+*/
+function isIrreflexiva(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas == columnas && is) {
+                if (matriz[filas][columnas] == 0) {
+                    is = true;
+                } else {
+                    is = false;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
+
+function multiplicar(matriz, numero) {
+    var producto = [];
+    for (i = 0; i < numero; i++) {
+        producto[i] = [];
+        for (j = 0; j < numero; j++) {
+            producto[i][j] = matriz[i][j] * matriz[j][i];
+        }
+    }
+    return producto;
+}
+
+
+function esTransitiva() {
+    var matriz = getMatriz(),
+        numero = getNumero(),
+        producto = multiplicar(matriz, numero),
+        transitiva = true;
+
+    for (i = 0; i < numero; i++) {
+        for (j = 0; j < numero; j++) {
+            if (producto[i][j] > matriz[i][j]) {
+                transitiva = false;
+                continue;
+            }
+        }
+    }
+
+    return transitiva;
+}
+
+function esEquivalencia() {
+    var procesado = getProcesado(),
+        validar = ["Transitiva", "Reflexiva", "Transitiva"],
+        equivalencia = true;
+
+    if (Array.isArray(validar)) {
+        validar.forEach(function(prop) {
+            if (procesado[prop] === false) {
+                equivalencia = false;
+            }
+        });
+    }
+
+    return equivalencia;
+}
+
+function esOrden() {
+    return false;
+}
+
+function configuracion() {
+    var proceso = [{
+            "nombre": "Relaciones",
+            "funcion": relaciones(getMatriz()),
+            "regla": "Relacion de los nodos"
+        },
+        {
+            "nombre": "Reflexiva",
+            "funcion": isReflexica(getMatriz()),
+            "regla": "Su diagonal principal contiene todos en 1"
+        },
+        {
+            "nombre": "Ireflexiva",
+            "funcion": isIrreflexiva(getMatriz()),
+            "regla": "Su diagonal principal contiene todos en 0"
+        },
+        {
+            "nombre": "Transitiva",
+            "funcion": esTransitiva(),
+            "regla": "Si el producto matricial es menor o igual a la matriz"
+        }
+    ];
+    procesar(proceso);
+
+    var finalizar = [{
+            "nombre": "Equivalencia",
+            "funcion": esEquivalencia(),
+            "regla": "Si es refletiva, simétrica y transitiva"
+        },
+        {
+            "nombre": "Orden",
+            "funcion": esOrden(),
+            "regla": "Orden Parcial: Si es refletiva, antisimetrica y transitiva.<br>" +
+                "Orden Total: Si es parcial y cada par de elemento es compatibles"
+        }
+    ];
+    procesar(finalizar);
+}
+
+function procesar(proceso) {
+    if (Array.isArray(proceso)) {
+        proceso.forEach(function(prop) {
+            setProcesado(prop.nombre, prop.funcion);
+            setImprimir(prop.nombre, prop.funcion, prop.regla);
+        });
+    }
+}
+
 
 /*
  * Funciones que se ejecutan al cargar el documento.
@@ -112,43 +397,30 @@ $(document).ready(function() {
  */
 $("#numero").keyup(function() {
     var numero = $(this).val();
-    crearTabla(IDTABLE, numero);
+    if (!validaNumero(numero)) {
+        mostrarMensaje("Valor no valido, debe ser numerico y mayor a 2");
+        $("#procesar").prop('disabled', true);
+    } else {
+        $("#procesar").prop('disabled', false);
+        crearTabla(IDTABLE, numero);
+    }
+    $("#" + TARJETAPROPIEDADES).addClass('d-none');
 });
-
 
 $("#llenarMatriz").click(function() {
     var numero = $("#numero").val();
-    llenarTablaDinamica(IDTABLE, numero);
+    llenarTablaDinamica(numero);
 });
-
-
-function llenarTablaDinamica(id, numero) {
-    $('#' + id).html('');
-    var celdas = "";
-
-    for (let i = 0; i <= numero; i++) {
-        let fila = "";
-        let titulo = (i == 0) ? true : false;
-
-        for (let j = 0; j <= numero; j++) {
-            if (i == 0 && j == 0) {
-                fila += '<th></th>';
-            } else if (j == 0 || titulo == true) {
-                let nodo = (i == 0) ? j : i;
-                fila += '<th class="text-center"><input type="text" class="form-control text-center negrita title" onkeyup="actulizarNombre(this)" name="titulo[' + i + '][' + j + ']" id="titulo' + i + j + '" value="Nodo' + nodo + '" data-inverso="' + j + i + '"></th>';
-            } else {
-                fila += '<td><select class="form-control text-center" name="valor[' + (i - 1) + '][' + (j - 1) + ']" id="valor[' + (i - 1) + '][' + (j - 1) + ']" ><option>' + Math.floor(Math.random() * 2); + '</option></select></td>';
-            }
-        }
-        celdas += '<tr>' + fila + '</tr>';
-    }
-
-    $('#' + id).append(celdas);
-    return celdas;
-}
 
 $("#LimpiarrMatriz").click(function() {
     var numero = $("#numero").val();
     crearTabla(IDTABLE, numero);
 });
 
+$("#procesar").click(function() {
+    obtenerInformacion();
+    configuracion();
+    $("#" + TARJETAPROPIEDADES).removeClass('d-none');
+    agregarPropiedad(IDPROPIEDADES);
+    log(informacion);
+});
