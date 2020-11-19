@@ -238,6 +238,55 @@ function relaciones(matriz) {
 
     return replaceAll(combinaciones, ', }', ' }');;
 }
+/*
+Funcion para saber si la matriz es reflexiva 
+parametros: matriz  return : boolean
+*/
+
+function isSimetrica(matriz) {
+    var is = false;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas != columnas && is == false) {
+                if (matriz[filas][columnas] == 1 && matriz[columnas][filas] == 1) {
+                    is = true;
+                } else {
+                    is = false;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
+
+/*
+Funcion para saber si la matriz es reflexiva 
+parametros: matriz  return : boolean
+*/
+
+function isAntisimetrica(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas != columnas && is) {
+                if (matriz[filas][columnas] == 1 && matriz[columnas][filas] == 1) {
+                    is = false;
+                } else {
+                    is = true;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
 
 /*
 Funcion para saber si la matriz es reflexiva 
@@ -249,7 +298,7 @@ function isReflexica(matriz) {
     var nColumnas = nFilas;
     for (var filas = 0; filas < nFilas; filas++) {
         for (var columnas = 0; columnas < nColumnas; columnas++) {
-            if (filas == columnas && is) {
+            if (filas != columnas && is) {
                 if (matriz[filas][columnas] == 1) {
                     is = true;
                 } else {
@@ -262,6 +311,10 @@ function isReflexica(matriz) {
     }
     return is;
 }
+
+
+
+
 /*
 Funcion para saber si la matriz es reflexiva 
 parametros: matriz  return : boolean
@@ -356,6 +409,16 @@ function configuracion() {
             "nombre": "Transitiva",
             "funcion": esTransitiva(),
             "regla": "Si el producto matricial es menor o igual a la matriz"
+        },
+        {
+            "nombre": "Simetrica",
+            "funcion": isSimetrica(getMatriz()),
+            "regla": "Si dentro de la matriz existen equivalentes"
+        },
+        {
+            "nombre": "Antisimetrica",
+            "funcion": isAntisimetrica(getMatriz()),
+            "regla": "Si dentro de la matriz no existen equivalentes"
         }
     ];
     procesar(proceso);
