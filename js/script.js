@@ -264,6 +264,40 @@ function isSimetrica(matriz) {
 }
 
 /*
+Funcion para saber si la matriz es Asimetrica 
+parametros: matriz  return : boolean
+*/
+
+function isAsimetrica(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas != columnas && is) {
+                if (matriz[filas][columnas] == 1 && matriz[columnas][filas] == 1) {
+                    is = false;
+                } else {
+                    is = true;
+                    continue;
+                }
+            } else if (filas == columnas && is) {
+                        if (matriz[filas][columnas] == 1) {
+                                is = false;
+                            } else {
+                                is = true;
+                                continue;
+                            }
+                    }
+
+            
+        }
+
+    }
+    return is;
+}
+
+/*
 Funcion para saber si la matriz es Antisimetrica 
 parametros: matriz  return : boolean
 */
@@ -414,6 +448,11 @@ function configuracion() {
             "nombre": "Simetrica",
             "funcion": isSimetrica(getMatriz()),
             "regla": "Si dentro de la matriz existen equivalentes"
+        },
+        {
+            "nombre": "Asimetrica",
+            "funcion": isAsimetrica(getMatriz()),
+            "regla": "Si dentro de la matriz no existen equivalentes y su diagonal principal contiene todos en 0"
         },
         {
             "nombre": "Antisimetrica",
