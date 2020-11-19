@@ -637,7 +637,7 @@ function generateGraph() {
     var names = [];
     for (var itera = 1; itera <= matriz.length; itera++) {
         names.push(itera);
-        console.log(itera);
+      
     }
     var nodeDataArray = [];
     for (var i = 0; i < matriz.length; i++) {
