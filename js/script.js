@@ -239,7 +239,7 @@ function relaciones(matriz) {
     return replaceAll(combinaciones, ', }', ' }');;
 }
 /*
-Funcion para saber si la matriz es reflexiva 
+Funcion para saber si la matriz es Simetrica 
 parametros: matriz  return : boolean
 */
 
@@ -264,7 +264,7 @@ function isSimetrica(matriz) {
 }
 
 /*
-Funcion para saber si la matriz es reflexiva 
+Funcion para saber si la matriz es Antisimetrica 
 parametros: matriz  return : boolean
 */
 
