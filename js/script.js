@@ -288,6 +288,56 @@ function isIrreflexiva(matriz) {
     return is;
 }
 
+/*
+Funcion para saber si la matriz es Simetrica 
+parametros: matriz  return : boolean
+*/
+
+function isSimetrica(matriz) {
+    var is = false;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas != columnas && is == false) {
+                if (matriz[filas][columnas] == 1 && matriz[columnas][filas] == 1) {
+                    is = true;
+                } else {
+                    is = false;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
+
+/*
+Funcion para saber si la matriz es Antisimetrica 
+parametros: matriz  return : boolean
+*/
+
+function isAntisimetrica(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas != columnas && is) {
+                if (matriz[filas][columnas] == 1 && matriz[columnas][filas] == 1) {
+                    is = false;
+                } else {
+                    is = true;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
+
 function multiplicar(matriz, numero) {
     var producto = [];
     for (i = 0; i < numero; i++) {
@@ -365,6 +415,16 @@ function configuracion() {
             "nombre": "Ireflexiva",
             "funcion": isIrreflexiva(getMatriz()),
             "regla": "Su diagonal principal contiene todos en 0"
+        },
+        {
+            "nombre": "Simetrica",
+            "funcion": isSimetrica(getMatriz()),
+            "regla": "Si dentro de la matriz existen equivalentes"
+        },
+        {
+            "nombre": "Antisimetrica",
+            "funcion": isAntisimetrica(getMatriz()),
+            "regla": "Si dentro de la matriz no existen equivalentes"
         },
         {
             "nombre": "Transitiva",
