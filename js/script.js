@@ -534,4 +534,134 @@ $("#procesar").click(function() {
     $("#" + IDRECORRIDO).removeClass('d-none');
     agregarPropiedad(IDPROPIEDADES);
     log(informacion);
+    generateGraph();
 });
+
+
+function init() {
+    var $ = go.GraphObject.make; // for conciseness in defining templates
+    myDiagram =
+        $(go.Diagram, "myDiagramDiv", // must be the ID or a reference to a DIV
+            {
+                initialAutoScale: go.Diagram.Uniform,
+                contentAlignment: go.Spot.Center,
+                layout: $(go.ForceDirectedLayout, {
+                    defaultSpringLength: 10,
+                    maxIterations: 300
+                }),
+                maxSelectionCount: 2
+            });
+
+    // define the Node template
+    myDiagram.nodeTemplate =
+        $(go.Node, "Horizontal", {
+                locationSpot: go.Spot.Center, // Node.location is the center of the Shape
+                locationObjectName: "SHAPE",
+                selectionAdorned: false,
+                selectionChanged: null // defined below
+            },
+            $(go.Panel, "Spot",
+                $(go.Shape, "Circle", {
+                        name: "SHAPE",
+                        fill: "lightgray", // default value, but also data-bound
+                        strokeWidth: 0,
+                        desiredSize: new go.Size(30, 30),
+                        portId: "" // so links will go to the shape, not the whole node
+                    },
+                    new go.Binding("fill", "isSelected", function(s, obj) {
+                        return s ? "red" : obj.part.data.color;
+                    }).ofObject()),
+                $(go.TextBlock,
+                    new go.Binding("text", "distance", function(d) {
+                        return (d === Infinity) ? "INF" : d | 0;
+                    }))),
+            $(go.TextBlock,
+                new go.Binding("text"))
+        );
+
+    // define the Link template
+    myDiagram.linkTemplate =
+        $(go.Link, {
+                selectable: false, // links cannot be selected by the user
+                curve: go.Link.Bezier,
+                layerName: "Background" // don't cross in front of any nodes
+            },
+            $(go.Shape, // this shape only shows when it isHighlighted
+                {
+                    isPanelMain: true,
+                    stroke: null,
+                    strokeWidth: 5
+                },
+                new go.Binding("stroke", "isHighlighted", function(h) {
+                    return h ? "red" : null;
+                }).ofObject()),
+            $(go.Shape,
+                // mark each Shape to get the link geometry with isPanelMain: true
+                {
+                    isPanelMain: true,
+                    stroke: "black",
+                    strokeWidth: 1
+                },
+                new go.Binding("stroke", "color")),
+            $(go.Shape, {
+                toArrow: "Standard"
+            })
+        );
+    myDiagram.toolManager.clickSelectingTool.standardMouseSelect = function() {
+        var diagram = this.diagram;
+        if (diagram === null || !diagram.allowSelect) return;
+        var e = diagram.lastInput;
+        var count = diagram.selection.count;
+        var curobj = diagram.findPartAt(e.documentPoint, false);
+        if (curobj !== null) {
+            if (count < 2) { 
+                if (!curobj.isSelected) {
+                    var part = curobj;
+                    if (part !== null) part.isSelected = true;
+                }
+            } else {
+                if (!curobj.isSelected) {
+                    var part = curobj;
+                    if (part !== null) diagram.select(part);
+                }
+            }
+        } else if (e.left && !(e.control || e.meta) && !e.shift) {
+            diagram.clearSelection();
+        }
+    }
+
+}
+
+function generateGraph() {
+    var matriz = getMatriz()
+    var names = [];
+    for (var itera = 1; itera <= matriz.length; itera++) {
+        names.push(itera);
+        console.log(itera);
+    }
+    var nodeDataArray = [];
+    for (var i = 0; i < matriz.length; i++) {
+        nodeDataArray.push({
+            key: i,
+            text: names[i],
+            color: go.Brush.randomColor(128, 240)
+        });
+    }
+    var linkDataArray = [];
+    var nFilas = matriz.length;
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (matriz[filas][columnas] == 1) {
+                linkDataArray.push({
+                    from: filas,
+                    to:  columnas,
+                    color: go.Brush.randomColor(0, 127)
+                });
+
+            }
+        }
+
+    }
+    myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+}
