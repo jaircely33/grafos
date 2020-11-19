@@ -338,6 +338,32 @@ function isAntisimetrica(matriz) {
     return is;
 }
 
+function isAsimetrica(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas != columnas && is) {
+                if (matriz[filas][columnas] == 1 && matriz[columnas][filas] == 1) {
+                    is = false;
+                } else {
+                    is = true;
+                    continue;
+                }
+            } else if (filas == columnas && is) {
+                if (matriz[filas][columnas] == 1) {
+                    is = false;
+                } else {
+                    is = true;
+                    continue;
+                }
+            }
+        }
+    }
+    return is;
+}
+
 function multiplicar(matriz, numero) {
     var producto = [];
     for (i = 0; i < numero; i++) {
@@ -422,6 +448,11 @@ function configuracion() {
             "regla": "Si dentro de la matriz existen equivalentes"
         },
         {
+            "nombre": "Asimetrica",
+            "funcion": isAsimetrica(getMatriz()),
+            "regla": "Si dentro de la matriz no existen equivalentes y su diagonal principal contiene todos en 0"
+        },
+        {
             "nombre": "Antisimetrica",
             "funcion": isAntisimetrica(getMatriz()),
             "regla": "Si dentro de la matriz no existen equivalentes"
@@ -464,6 +495,8 @@ function procesar(proceso) {
  */
 $(document).ready(function() {
     crearTabla(IDTABLE, DEFAULT);
+    var numero = $("#numero").val();
+    llenarTablaDinamica(numero);
 });
 
 /*
