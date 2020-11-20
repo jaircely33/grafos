@@ -50,14 +50,6 @@ select {
     vertical-align: middle !important;
 }
 
-#tableProperty tr th {
-    width: 16%;
-}
-
-#tableProperty tr td {
-    width: 42%;
-}
-
 
 /* Se agrega la fuente Rubik
  * cyrillic-ext 

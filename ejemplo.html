@@ -8,10 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script src="js/go.js"></script>
-
+ 
     <script id="code">
         function init() {
-
+          
             var $ = go.GraphObject.make; // for conciseness in defining templates
 
             myDiagram =
@@ -110,30 +110,27 @@
 
             generateGraph();
 
-
+           
         }
 
         // Create an assign a model that has a bunch of nodes with a bunch of random links between them.
         function generateGraph() {
-            var matriz = [
-                //Columnas:   0 1 2 3 4
-                /*Filas: 0*/
-                [1, 1, 0],
-                /*       1*/
-                [0, 1, 0],
-                /*       2*/
-                [1, 0, 1]
+var matriz = [
+//Columnas:   0 1 2 3 4
+/*Filas: 0*/ [1,1,0],
+/*       1*/ [0,1,0],
+/*       2*/ [1,0,1]
             ];
 
-            var names = ["A", "B", "C"];
-            for (var itera = 1; itera <= matriz.length; itera++) {
-                names.push(itera);
-                console.log(itera);
-            }
-
+ var names = [];
+for(var itera=1; itera<=matriz.length;itera++){
+names.push(itera);
+console.log(itera);
+}
+          
 
             var nodeDataArray = [];
-
+ 
 
             for (var i = 0; i < matriz.length; i++) {
                 nodeDataArray.push({
@@ -145,34 +142,38 @@
 
             var linkDataArray = [];
             var num = nodeDataArray.length;
+            
+var nFilas = matriz.length;
+  var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+           if(matriz[filas][columnas]==1){
+                linkDataArray.push({
+                    from: columnas,
+                    to:  filas,
+                    color: go.Brush.randomColor(0, 127)
+                });
+               
+           }
+        }
 
-            var nFilas = matriz.length;
-            var nColumnas = nFilas;
-            for (var filas = 0; filas < nFilas; filas++) {
-                for (var columnas = 0; columnas < nColumnas; columnas++) {
-                    if (matriz[filas][columnas] == 1) {
-                        linkDataArray.push({
-                            from: columnas,
-                            to: filas,
-                            color: go.Brush.randomColor(0, 127)
-                        });
+    }
 
-                    }
-                }
-
-            }
-
-
+ 
             myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
         }
+
+        
+
+
     </script>
 </head>
 
 <body onload="init()">
     <div id="sample">
         <div id="myDiagramDiv" style="border: solid 1px black; background: white; width: 100%; height: 700px"></div>
-
-
+      
+        
 </body>
 
 </html>
