@@ -423,7 +423,29 @@ function esOrden() {
         });
     }
 
-    return parcial;
+    if (parcial === true && esTotal() === true) {
+        return "Total";
+    } else if (parcial === true) {
+        return "Parcial";
+    }
+
+    return MENSAJE_NOCUMPLE;
+}
+
+function esTotal() {
+    var matriz = getMatriz(),
+        numero = getNumero(),
+        total = true;
+
+    for (var i = 1; i < numero; i++) {
+        for (var j = 0; j < i; j++) {
+            if (matriz[i][j] == "0" && matriz[j][i] == "0") {
+                total = false;
+            }
+        }
+    }
+
+    return total;
 }
 
 function configuracion() {
@@ -512,7 +534,7 @@ $("#numero").keyup(function() {
         crearTabla(IDTABLE, numero);
     }
     $("#" + TARJETAPROPIEDADES).addClass('d-none');
-    $("#" + IDRECORRIDO).addClass('d-none');
+    //$("#" + IDRECORRIDO).addClass('d-none');
     $("#" + IDGRAFO).addClass('d-none');
 });
 
@@ -531,7 +553,7 @@ $("#procesar").click(function() {
     configuracion();
     $("#" + TARJETAPROPIEDADES).removeClass('d-none');
     $("#" + IDGRAFO).removeClass('d-none');
-    $("#" + IDRECORRIDO).removeClass('d-none');
+    //$("#" + IDRECORRIDO).removeClass('d-none');
     agregarPropiedad(IDPROPIEDADES);
     log(informacion);
     generateGraph();
@@ -614,7 +636,7 @@ function init() {
         var count = diagram.selection.count;
         var curobj = diagram.findPartAt(e.documentPoint, false);
         if (curobj !== null) {
-            if (count < 2) { 
+            if (count < 2) {
                 if (!curobj.isSelected) {
                     var part = curobj;
                     if (part !== null) part.isSelected = true;
@@ -634,10 +656,10 @@ function init() {
 
 function generateGraph() {
     var matriz = getMatriz()
-    var names = [];
+    var names = getTitulos();
     for (var itera = 1; itera <= matriz.length; itera++) {
         names.push(itera);
-      
+
     }
     var nodeDataArray = [];
     for (var i = 0; i < matriz.length; i++) {
@@ -655,7 +677,7 @@ function generateGraph() {
             if (matriz[filas][columnas] == 1) {
                 linkDataArray.push({
                     from: filas,
-                    to:  columnas,
+                    to: columnas,
                     color: go.Brush.randomColor(0, 127)
                 });
 
