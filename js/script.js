@@ -16,7 +16,9 @@ var POSIBLES_VALORES = [0, 1], //Posibles valores para llenar la matriz
     IDPROPIEDADES = 'tableProperty',
     TARJETAPROPIEDADES = 'tarjetaPropiedades',
     MENSAJE_CUMPLE = 'Cumple',
-    MENSAJE_NOCUMPLE = 'No cumple';
+    MENSAJE_NOCUMPLE = 'No cumple',
+    IDGRAFO = 'grafos',
+    IDRECORRIDO = 'recorrido';
 
 /*
  * Funcion que imprimer con sangria y espacios en consola.
@@ -373,6 +375,82 @@ function isIrreflexiva(matriz) {
     return is;
 }
 
+/*
+Funcion para saber si la matriz es Simetrica 
+parametros: matriz  return : boolean
+*/
+
+function isSimetrica(matriz) {
+    var is = false;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas != columnas && is == false) {
+                if (matriz[filas][columnas] == 1 && matriz[columnas][filas] == 1) {
+                    is = true;
+                } else {
+                    is = false;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
+
+/*
+Funcion para saber si la matriz es Antisimetrica 
+parametros: matriz  return : boolean
+*/
+
+function isAntisimetrica(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas != columnas && is) {
+                if (matriz[filas][columnas] == 1 && matriz[columnas][filas] == 1) {
+                    is = false;
+                } else {
+                    is = true;
+                    continue;
+                }
+            }
+        }
+
+    }
+    return is;
+}
+
+function isAsimetrica(matriz) {
+    var is = true;
+    var nFilas = getNumero();
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (filas != columnas && is) {
+                if (matriz[filas][columnas] == 1 && matriz[columnas][filas] == 1) {
+                    is = false;
+                } else {
+                    is = true;
+                    continue;
+                }
+            } else if (filas == columnas && is) {
+                if (matriz[filas][columnas] == 1) {
+                    is = false;
+                } else {
+                    is = true;
+                    continue;
+                }
+            }
+        }
+    }
+    return is;
+}
+
 function multiplicar(matriz, numero) {
     var producto = [];
     for (i = 0; i < numero; i++) {
@@ -405,7 +483,7 @@ function esTransitiva() {
 
 function esEquivalencia() {
     var procesado = getProcesado(),
-        validar = ["Transitiva", "Reflexiva", "Transitiva"],
+        validar = ["Reflexiva", "Simetrica", "Transitiva"],
         equivalencia = true;
 
     if (Array.isArray(validar)) {
@@ -420,7 +498,41 @@ function esEquivalencia() {
 }
 
 function esOrden() {
-    return false;
+    var procesado = getProcesado(),
+        validar = ["Reflexiva", "Antisimetrica", "Transitiva"],
+        parcial = true;
+
+    if (Array.isArray(validar)) {
+        validar.forEach(function(prop) {
+            if (procesado[prop] === false) {
+                parcial = false;
+            }
+        });
+    }
+
+    if (parcial === true && esTotal() === true) {
+        return "Total";
+    } else if (parcial === true) {
+        return "Parcial";
+    }
+
+    return MENSAJE_NOCUMPLE;
+}
+
+function esTotal() {
+    var matriz = getMatriz(),
+        numero = getNumero(),
+        total = true;
+
+    for (var i = 1; i < numero; i++) {
+        for (var j = 0; j < i; j++) {
+            if (matriz[i][j] == "0" && matriz[j][i] == "0") {
+                total = false;
+            }
+        }
+    }
+
+    return total;
 }
 
 function configuracion() {
@@ -438,6 +550,21 @@ function configuracion() {
             "nombre": "Ireflexiva",
             "funcion": isIrreflexiva(getMatriz()),
             "regla": "Su diagonal principal contiene todos en 0"
+        },
+        {
+            "nombre": "Simetrica",
+            "funcion": isSimetrica(getMatriz()),
+            "regla": "Si dentro de la matriz existen equivalentes"
+        },
+        {
+            "nombre": "Asimetrica",
+            "funcion": isAsimetrica(getMatriz()),
+            "regla": "Si dentro de la matriz no existen equivalentes y su diagonal principal contiene todos en 0"
+        },
+        {
+            "nombre": "Antisimetrica",
+            "funcion": isAntisimetrica(getMatriz()),
+            "regla": "Si dentro de la matriz no existen equivalentes"
         },
         {
             "nombre": "Transitiva",
@@ -470,8 +597,8 @@ function configuracion() {
         {
             "nombre": "Orden",
             "funcion": esOrden(),
-            "regla": "Orden Parcial: Si es refletiva, antisimetrica y transitiva.<br>" +
-                "Orden Total: Si es parcial y cada par de elemento es compatibles"
+            "regla": "<i>Orden Parcial:</i> Si es refletiva, antisimetrica y transitiva.<br>" +
+                "<i>Orden Total:</i> Si es parcial y cada par de elemento es compatibles"
         }
     ];
     procesar(finalizar);
@@ -492,6 +619,8 @@ function procesar(proceso) {
  */
 $(document).ready(function() {
     crearTabla(IDTABLE, DEFAULT);
+    var numero = $("#numero").val();
+    llenarTablaDinamica(numero);
 });
 
 /*
@@ -507,6 +636,8 @@ $("#numero").keyup(function() {
         crearTabla(IDTABLE, numero);
     }
     $("#" + TARJETAPROPIEDADES).addClass('d-none');
+    //$("#" + IDRECORRIDO).addClass('d-none');
+    $("#" + IDGRAFO).addClass('d-none');
 });
 
 $("#llenarMatriz").click(function() {
@@ -523,6 +654,138 @@ $("#procesar").click(function() {
     obtenerInformacion();
     configuracion();
     $("#" + TARJETAPROPIEDADES).removeClass('d-none');
+    $("#" + IDGRAFO).removeClass('d-none');
+    //$("#" + IDRECORRIDO).removeClass('d-none');
     agregarPropiedad(IDPROPIEDADES);
     log(informacion);
+    generateGraph();
 });
+
+
+function init() {
+    var $ = go.GraphObject.make; // for conciseness in defining templates
+    myDiagram =
+        $(go.Diagram, "myDiagramDiv", // must be the ID or a reference to a DIV
+            {
+                initialAutoScale: go.Diagram.Uniform,
+                contentAlignment: go.Spot.Center,
+                layout: $(go.ForceDirectedLayout, {
+                    defaultSpringLength: 10,
+                    maxIterations: 300
+                }),
+                maxSelectionCount: 2
+            });
+
+    // define the Node template
+    myDiagram.nodeTemplate =
+        $(go.Node, "Horizontal", {
+                locationSpot: go.Spot.Center, // Node.location is the center of the Shape
+                locationObjectName: "SHAPE",
+                selectionAdorned: false,
+                selectionChanged: null // defined below
+            },
+            $(go.Panel, "Spot",
+                $(go.Shape, "Circle", {
+                        name: "SHAPE",
+                        fill: "lightgray", // default value, but also data-bound
+                        strokeWidth: 0,
+                        desiredSize: new go.Size(30, 30),
+                        portId: "" // so links will go to the shape, not the whole node
+                    },
+                    new go.Binding("fill", "isSelected", function(s, obj) {
+                        return s ? "red" : obj.part.data.color;
+                    }).ofObject()),
+                $(go.TextBlock,
+                    new go.Binding("text", "distance", function(d) {
+                        return (d === Infinity) ? "INF" : d | 0;
+                    }))),
+            $(go.TextBlock,
+                new go.Binding("text"))
+        );
+
+    // define the Link template
+    myDiagram.linkTemplate =
+        $(go.Link, {
+                selectable: false, // links cannot be selected by the user
+                curve: go.Link.Bezier,
+                layerName: "Background" // don't cross in front of any nodes
+            },
+            $(go.Shape, // this shape only shows when it isHighlighted
+                {
+                    isPanelMain: true,
+                    stroke: null,
+                    strokeWidth: 5
+                },
+                new go.Binding("stroke", "isHighlighted", function(h) {
+                    return h ? "red" : null;
+                }).ofObject()),
+            $(go.Shape,
+                // mark each Shape to get the link geometry with isPanelMain: true
+                {
+                    isPanelMain: true,
+                    stroke: "black",
+                    strokeWidth: 1
+                },
+                new go.Binding("stroke", "color")),
+            $(go.Shape, {
+                toArrow: "Standard"
+            })
+        );
+    myDiagram.toolManager.clickSelectingTool.standardMouseSelect = function() {
+        var diagram = this.diagram;
+        if (diagram === null || !diagram.allowSelect) return;
+        var e = diagram.lastInput;
+        var count = diagram.selection.count;
+        var curobj = diagram.findPartAt(e.documentPoint, false);
+        if (curobj !== null) {
+            if (count < 2) {
+                if (!curobj.isSelected) {
+                    var part = curobj;
+                    if (part !== null) part.isSelected = true;
+                }
+            } else {
+                if (!curobj.isSelected) {
+                    var part = curobj;
+                    if (part !== null) diagram.select(part);
+                }
+            }
+        } else if (e.left && !(e.control || e.meta) && !e.shift) {
+            diagram.clearSelection();
+        }
+    }
+
+}
+
+function generateGraph() {
+    var matriz = getMatriz()
+    var names = getTitulos();
+    for (var itera = 1; itera <= matriz.length; itera++) {
+        names.push(itera);
+
+    }
+    var nodeDataArray = [];
+    for (var i = 0; i < matriz.length; i++) {
+        nodeDataArray.push({
+            key: i,
+            text: names[i],
+            color: go.Brush.randomColor(128, 240)
+        });
+    }
+    var linkDataArray = [];
+    var nFilas = matriz.length;
+    var nColumnas = nFilas;
+    for (var filas = 0; filas < nFilas; filas++) {
+        for (var columnas = 0; columnas < nColumnas; columnas++) {
+            if (matriz[filas][columnas] == 1) {
+                linkDataArray.push({
+                    from: filas,
+                    to: columnas,
+                    color: go.Brush.randomColor(0, 127)
+                });
+
+            }
+        }
+
+    }
+    myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+}
